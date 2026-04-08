@@ -69,11 +69,35 @@ def download_audio():
     }
     
     # 强制按上传日期排序 (这是专家模式提醒的关键点)
-    search_query = f"ytsearchdate5:{KEYWORD}"
+        # 第一步：搜索并获取视频信息列表（按日期排序）
+    search_query = f"ytsearch10:{KEYWORD}"
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
-            ydl.download([search_query])
+            # 先提取搜索结果，不下载
+            info = ydl.extract_info(search_query, download=False)
+            
+            if not info or 'entries' not in info:
+                print("❌ 未搜索到任何视频")
+                return
+                
+            videos = info['entries']
+            # 按上传日期降序排序（最新的在前）
+            videos = [v for v in videos if v.get('upload_date')]
+            videos.sort(key=lambda x: x.get('upload_date', ''), reverse=True)
+            
+            # 取前 5 个最新视频的 URL
+            video_urls = [v['webpage_url'] for v in videos[:5]]
+            
+            print(f"📋 找到 {len(video_urls)} 个视频，开始检查过滤条件...")
+            
+            # 第二步：用过滤条件下载这些 URL
+            for url in video_urls:
+                try:
+                    ydl.download([url])
+                except Exception as e:
+                    print(f"下载失败 {url}: {e}")
+                    
         except Exception as e:
             print(f"执行异常: {e}")
             
