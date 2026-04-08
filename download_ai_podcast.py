@@ -54,7 +54,7 @@ def create_ydl_opts(cookies_file=None):
         return filter_by_date_and_id(info_dict, downloaded_ids)
     
     opts = {
-        'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',,
+        'format': 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
